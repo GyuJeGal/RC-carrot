@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="feba60aa-29fc-4f18-9cad-5f86d8348363" name="RC_spring" url="https://sogogi.shop">
+        <fileTransfer rootFolder="/var/www/RC-springboot" accessType="SFTP" host="3.34.225.45" port="22" sshConfigId="9b946acd-03e1-4626-bdca-c1e9e64f675e" sshConfig="ubuntu@3.34.225.45:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
