@@ -105,6 +105,8 @@ public enum BaseResponseStatus {
     FAILED_DELETE_SELLPOST(false,3060,"게시글을 삭제할 수 없습니다."),
 
     FAILED_TO_SEARCH_POST(false,3070,"없는 동네 생활 게시글입니다."),
+    
+    LOGIN_FAILED(false,3080,"로그인에 실패하였습니다."),
 
     /**
      * 4000 : Database, Server 오류

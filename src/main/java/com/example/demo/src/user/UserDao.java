@@ -353,6 +353,19 @@ public class UserDao {
                         rs.getInt("countLikes")), getInterestParam);
         return getInterestLists;
     }
+
+    public int getUserId(String phoneNumber) {
+        String getUserIdQuery = "select userId from User where phoneNumber = ?";
+        String getUserIdParam = phoneNumber;
+
+        return this.jdbcTemplate.queryForObject(getUserIdQuery, int.class, getUserIdParam);
+    }
+
+    public int isValidUser(String phoneNumber) {
+        String checkQuery = "select exists (select userId from User where status = 1 and phoneNumber = ?)";
+        String checkParam = phoneNumber;
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class, checkParam);
+    }
 }
 
 

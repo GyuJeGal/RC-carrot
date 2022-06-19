@@ -1,18 +1,21 @@
 package com.example.demo.src.user;
 
 import com.example.demo.config.BaseException;
+import com.example.demo.config.BaseResponse;
 import com.example.demo.src.user.model.*;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
 @Service
+@Transactional
 public class UserService {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -43,7 +46,6 @@ public class UserService {
     }
 
     public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
-
 
         if(userDao.checkPhoneNumber(postUserReq.getPhoneNumber()) == 1) {
             throw new BaseException(DUPLICATED_PHONE_NUMBER);
@@ -174,5 +176,25 @@ public class UserService {
             throw new BaseException(DATABASE_ERROR);
         }
 
+    }
+
+    public PostLoginRes logIn(String phoneNumber) throws  BaseException {
+
+        //로그인 할려고 하는 휴대폰 번호가 없을 때
+        //당근 마켓은 id나 비밀번호 없이 휴대폰 번호로 로그인
+
+        if(userDao.isValidUser(phoneNumber) == 0) {
+            throw new BaseException(LOGIN_FAILED);
+        }
+
+        try {
+            int userId = userDao.getUserId(phoneNumber);
+            String jwt = jwtService.createJwt(userId);
+
+            return new PostLoginRes(userId, jwt);
+
+        }catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
     }
 }

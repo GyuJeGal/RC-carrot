@@ -37,6 +37,11 @@ public class SellPostController {
     @GetMapping("/{userId}")
     public BaseResponse<List<GetSellPostsRes>> getSellPosts(@PathVariable("userId") int userId) {
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             List<GetSellPostsRes> getSellPostsRes = sellPostService.getSellPosts(userId);
             return new BaseResponse<>(getSellPostsRes);
         } catch (BaseException exception) {
@@ -49,6 +54,11 @@ public class SellPostController {
     @GetMapping("/{userId}/{sellPostId}")
     public BaseResponse<GetSellPostRes> getSellPost(@PathVariable("userId") int userId, @PathVariable("sellPostId") int sellPostId) {
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             GetSellPostRes getSellPostRes = sellPostService.getSellPost(userId, sellPostId);
             return new BaseResponse<>(getSellPostRes);
         } catch (BaseException exception) {
@@ -121,6 +131,11 @@ public class SellPostController {
         }
 
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             sellPostService.createSellPost(userId, postSellPostReq);
             String result = "게시글 생성을 완료했습니다.";
             return new BaseResponse<>(result);
@@ -133,6 +148,11 @@ public class SellPostController {
     @PatchMapping("/{userId}/delete")
     public BaseResponse<String> deleteSellPost(@PathVariable int userId, @RequestBody DeleteSellPost deleteSellPost) {
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             deleteSellPost.setUserId(userId);
             sellPostService.deleteSellPost(deleteSellPost);
             String result = "게시글 삭제를 완료했습니다.";

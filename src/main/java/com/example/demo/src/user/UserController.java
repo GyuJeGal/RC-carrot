@@ -17,6 +17,7 @@ import static com.example.demo.config.BaseResponseStatus.*;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final UserService userService;
@@ -27,6 +28,24 @@ public class UserController {
         this.userService = userService;
         this.jwtService = jwtService;
     }
+
+    @ResponseBody
+    @PostMapping("/login")
+    public BaseResponse<PostLoginRes> logIn(@RequestBody PostLogInReq postLogInReq) {
+
+        String phoneNumberPattern = "^01(?:0|1|[6-9])[.-]?(\\d{3}|\\d{4})[.-]?(\\d{4})$";
+        if(!Pattern.matches(phoneNumberPattern, postLogInReq.getPhoneNumber())) {
+            return new BaseResponse<>(POST_USERS_INVALID_PHONE_NUMBER);
+        }
+
+        try {
+            PostLoginRes postLoginRes = userService.logIn(postLogInReq.getPhoneNumber());
+            return new BaseResponse<>(postLoginRes);
+        }catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
 
     @PostMapping("")
     @ResponseBody
@@ -88,9 +107,11 @@ public class UserController {
     @ResponseBody
     @GetMapping("/{userId}")
     public BaseResponse<GetUserRes> getUser(@PathVariable("userId") int userId) {
+
         try {
             GetUserRes getUserRes = userService.getUser(userId);
             return new BaseResponse<>(getUserRes);
+
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
@@ -99,6 +120,16 @@ public class UserController {
     @ResponseBody
     @PatchMapping("/{userId}")
     public BaseResponse<String> modifyUser(@PathVariable("userId") int userId, @RequestBody User user) {
+
+        try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
 
         if(user.getNickName() == null) {
             return new BaseResponse<>(PATCH_USERS_EMPTY_NICKNAME);
@@ -139,6 +170,11 @@ public class UserController {
     @PatchMapping("/{userId}/delete")
     public BaseResponse<String> deleteUser(@PathVariable("userId") int userId) {
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             userService.deleteUser(userId);
             String result = "사용자 삭제 완료했습니다.";
 
@@ -168,6 +204,11 @@ public class UserController {
 
 
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             PatchUserEmail patchUserEmail = new PatchUserEmail(userId, userEmail.getEmail());
             userService.modifyUserEmail(patchUserEmail);
             String result = "사용자 e-mail 등록 완료했습니다.";
@@ -192,6 +233,11 @@ public class UserController {
         }
 
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             PatchPhoneNumber patchPhoneNumber = new PatchPhoneNumber(userId, phoneNumber.getPhoneNumber());
             userService.modifyPhoneNumber(patchPhoneNumber);
             String result = "사용자 휴대폰 번호 변경 완료했습니다.";
@@ -206,6 +252,11 @@ public class UserController {
     @GetMapping("/{userId}/buyList")
     public BaseResponse<List<GetUsersBuyList>> getBuyList(@PathVariable("userId") int userId) {
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             List<GetUsersBuyList> getUsersBuyList = userService.getBuyList(userId);
             return new BaseResponse<>(getUsersBuyList);
         } catch (BaseException exception) {
@@ -217,6 +268,11 @@ public class UserController {
     @GetMapping("/{userId}/sellList")
     public BaseResponse<List<GetUserSellList>> getSellList(@PathVariable("userId") int userId)  {
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             List<GetUserSellList> getUserSellLists = userService.getSellList(userId);
             return new BaseResponse<>(getUserSellLists);
         } catch (BaseException exception) {
@@ -228,6 +284,11 @@ public class UserController {
     @GetMapping("/{userId}/notices")
     public BaseResponse<List<GetUserNotices>> getNotices(@PathVariable int userId) {
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             return new BaseResponse<>(userService.getUserNotices(userId));
 
         } catch(BaseException exception) {
@@ -239,6 +300,11 @@ public class UserController {
     @GetMapping("/{userId}/{noticeId}")
     public BaseResponse<GetUserNotice> getNotice(@PathVariable("userId") int userId, @PathVariable("noticeId") int noticeId) {
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             return new BaseResponse<>(userService.getUserNotice(userId, noticeId));
 
         } catch(BaseException exception) {
@@ -250,6 +316,11 @@ public class UserController {
     @GetMapping("/{userId}/gather")
     public BaseResponse<List<GetUserGathers>> getUserGather(@PathVariable int userId) {
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             List<GetUserGathers> getUserGathers = userService.getUserGather(userId);
             return new BaseResponse<>(getUserGathers);
 
@@ -267,6 +338,11 @@ public class UserController {
         }
 
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             return new BaseResponse<>(userService.getUserAccountList(userId, searchYearMonth));
 
         } catch(BaseException exception) {
@@ -278,6 +354,11 @@ public class UserController {
     @GetMapping("/{userId}/interestList")
     public BaseResponse<List<GetInterestList>> getInterestList(@PathVariable int userId) {
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             List<GetInterestList> getInterestLists = userService.getInterestList(userId);
             return new BaseResponse<>(getInterestLists);
         } catch(BaseException exception) {

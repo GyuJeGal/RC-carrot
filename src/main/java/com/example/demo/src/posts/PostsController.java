@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.GET_POSTS_RANGE_TOPICNAME;
+import static com.example.demo.config.BaseResponseStatus.INVALID_USER_JWT;
 
 @RestController
 @RequestMapping("/posts")
@@ -36,6 +37,11 @@ public class PostsController {
     public BaseResponse<List<GetPostsRes>> getPosts(@PathVariable int userId, @RequestParam(value = "topicName", required = false) String topicName) {
 
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             if(topicName == null) {
                 List<GetPostsRes> getPostsResList = postsService.getPosts(userId);
                 return new BaseResponse<>(getPostsResList);
@@ -57,6 +63,11 @@ public class PostsController {
     @GetMapping("/{userId}/{postId}")
     public BaseResponse<GetPostRes> getPost(@PathVariable("userId") int userId, @PathVariable("postId") int postId) {
         try {
+            int userIdByJwt = jwtService.getUserIdx();
+            if(userIdByJwt != userId) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
             GetPostRes getPostRes = postsService.getPost(userId, postId);
             return new BaseResponse<>(getPostRes);
         } catch (BaseException exception) {
